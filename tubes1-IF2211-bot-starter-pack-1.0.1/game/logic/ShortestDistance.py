@@ -60,10 +60,10 @@ class ShortestDistance(BaseLogic):
                 if (sorted_red[0][0] <= sorted_blue[0][0]) :
                     self.goal_position = sorted_red[0][1]
 
-            elif ((abs(current_position.x - sorted_list[0][1].properties.position.x) >= 7)or(abs(current_position.y - sorted_list[0][1].properties.position.y) >= 7)) :
-                if((abs(current_position.x - sorted_button[0][1].properties.position.x) <= 7)or(abs(current_position.y - sorted_button[0][1].properties.position.y) <= 7)) :
+            elif ((abs(current_position.x - sorted_list[0][1].position.x) >= 7)or(abs(current_position.y - sorted_list[0][1].position.y) >= 7)) :
+                if((abs(current_position.x - sorted_button[0][1].position.x) <= 7)or(abs(current_position.y - sorted_button[0][1].position.y) <= 7)) :
                     self.goal_position = sorted_button[0][1]
-                elif((abs(current_position.x - sorted_button[0][1].properties.position.x) >= 7)or(abs(current_position.y - sorted_button[0][1].properties.position.y) >= 7)):
+                elif((abs(current_position.x - sorted_button[0][1].position.x) >= 7)or(abs(current_position.y - sorted_button[0][1].position.y) >= 7)):
                     self.goal_position = sorted_list[0][1]
                     
         current_position = board_bot.position

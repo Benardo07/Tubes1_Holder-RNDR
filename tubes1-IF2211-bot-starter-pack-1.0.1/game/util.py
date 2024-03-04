@@ -4,7 +4,6 @@ from game.models import Board, Position
 def clamp(n, smallest, largest):
     return max(smallest, min(n, largest))
 
-
 def get_direction(current_x, current_y, dest_x, dest_y):
     delta_x = clamp(dest_x - current_x, -1, 1)
     delta_y = clamp(dest_y - current_y, -1, 1)
@@ -61,13 +60,27 @@ def find_diamond(current_position, board: Board):
         list_diamond.append([distance, position.position])
     return list_diamond
 
+def calc_distance(obj1, obj2):
+    return abs(obj1.x - obj2.x) + abs(obj1.y - obj2.y)
+
+def find_clusters(diamonds, threshold=3):  
+    clusters = []
+    for diamond in diamonds:
+        for cluster in clusters:
+            if any(calc_distance(diamond.position, d.position) <= threshold for d in cluster):
+                cluster.append(diamond)
+                break
+        else:
+            clusters.append([diamond])
+    return clusters
+
 def find_densest(diamonds, eps=1, min_samples=3):
     clusters = []
     visited = set()
     noise = set()
 
     def neighbors(diamond):
-        return [other for other in diamonds if count_distance(diamond.position, other.position) <= eps]
+        return [other for other in diamonds if calc_distance(diamond.position, other.position) <= eps]
 
     for diamond in diamonds:
         if diamond.id in visited:
