@@ -6,6 +6,10 @@ from game.api import Api
 from game.board_handler import BoardHandler
 from game.bot_handler import BotHandler
 from game.logic.random import RandomLogic
+from game.logic.HighestDensity import HighestDensity
+from game.logic.NearestBase import NewBot
+from game.logic.ShortestDistance import ShortestDistance
+from game.logic.PointDiamond import PointDiamond
 from game.util import *
 from game.logic.base import BaseLogic
 
@@ -14,6 +18,10 @@ BASE_URL = "http://localhost:3000/api"
 DEFAULT_BOARD_ID = 1
 CONTROLLERS = {
     "Random": RandomLogic,
+    "patcupuajg": HighestDensity,
+    "patpalingcupu" : NewBot,
+    "patkimak" : PointDiamond,
+    "wgjago" : ShortestDistance,
 }
 
 ###############################################################################

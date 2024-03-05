@@ -41,12 +41,12 @@ class ShortestDistance(BaseLogic):
 
             self.goal_position = sorted_list[0][1]
 
-            if(props.milliseconds_left < 8000 and props.diamonds != 0):
+            if(props.diamonds >= 3 and (base_distance <= 6 or base_distance_tele <= 6) and sorted_list[0][0] >= 5):
+                self.goal_position = board_bot.properties.base
+            
+            elif(props.milliseconds_left < 8000 and props.diamonds != 0):
                 self.goal_position = board_bot.properties.base
 
-            elif(props.diamonds >= 3 and (base_distance <= 6 or base_distance_tele <= 6) and sorted_list[0][0] >= 5):
-                self.goal_position = board_bot.properties.base
-                
             elif (props.diamonds >= 3 and (base_distance <= 6 or base_distance_tele <= 6) and sorted_list[0][0] <= 5):
                 self.goal_position = sorted_list[0][1]
 
@@ -60,11 +60,14 @@ class ShortestDistance(BaseLogic):
                 if (sorted_red[0][0] <= sorted_blue[0][0]) :
                     self.goal_position = sorted_red[0][1]
 
-            elif ((abs(current_position.x - sorted_list[0][1].position.x) >= 7)or(abs(current_position.y - sorted_list[0][1].position.y) >= 7)) :
-                if((abs(current_position.x - sorted_button[0][1].position.x) <= 7)or(abs(current_position.y - sorted_button[0][1].position.y) <= 7)) :
-                    self.goal_position = sorted_button[0][1]
-                elif((abs(current_position.x - sorted_button[0][1].position.x) >= 7)or(abs(current_position.y - sorted_button[0][1].position.y) >= 7)):
-                    self.goal_position = sorted_list[0][1]
+            # elif ((abs(current_position.x - sorted_list[0][1].position.x) >= 9)or(abs(current_position.y - sorted_list[0][1].position.y) >= 9)) :
+            #     if((abs(current_position.x - sorted_button[0][1].position.x) <= 9)or(abs(current_position.y - sorted_button[0][1].position.y) <= 9)) :
+            #         self.goal_position = sorted_button[0][1]
+            #     elif((abs(current_position.x - sorted_button[0][1].position.x) >= 9)or(abs(current_position.y - sorted_button[0][1].position.y) >= 9)):
+            #         self.goal_position = sorted_list[0][1]
+
+            #     else :
+            #         self.goal_position = sorted_list[0][1]
                     
         current_position = board_bot.position
         if self.goal_position:

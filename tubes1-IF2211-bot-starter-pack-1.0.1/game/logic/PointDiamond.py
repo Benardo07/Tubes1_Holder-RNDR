@@ -21,7 +21,7 @@ class PointDiamond(BaseLogic):
             distance2 = (abs(current_position.x - position.position.x) + abs(current_position.y - position.position.y))
             z.append([distance2,position.position])
         tele_sorted_list = sorted(z, key=lambda d: d[0])
-        print(tele_sorted_list)
+
 
         # Group teleporters by their pair_id
         teleport_groups = {}
@@ -86,7 +86,7 @@ class PointDiamond(BaseLogic):
             for pair_id, teleporters in sorted_teleport_groups.items():
                 closest_teleporter, distance_to_closest_teleporter = teleporters[0]
                 second_teleporter = teleporters[1][0]
-                print(second_teleporter)
+
                 # Calculate the distance from the second teleporter in the pair to the goal position
                 distance_tele2_goal = abs(second_teleporter.x - self.goal_position.x) + abs(second_teleporter.y - self.goal_position.y)
 
@@ -96,7 +96,7 @@ class PointDiamond(BaseLogic):
                 # Compare the total distance with the shortest way found so far
                 if way1 < shortest_way:
                     shortest_way = way1
-                    shortest_way_position = closest_teleporter.position
+                    shortest_way_position = closest_teleporter
 
 # Update the goal position to the shortest way position
             self.goal_position = shortest_way_position
