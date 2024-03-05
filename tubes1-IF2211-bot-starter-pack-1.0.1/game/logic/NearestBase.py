@@ -5,7 +5,7 @@ from game.logic.base import BaseLogic
 from game.models import GameObject, Board, Position
 from ..util import *
 
-class NearestBase(BaseLogic):
+class NewBot(BaseLogic):
     def __init__(self):
         self.directions = [(1, 0), (0, 1), (-1, 0), (0, -1)]
         self.goal_position: Optional[Position] = None
@@ -41,14 +41,14 @@ class NearestBase(BaseLogic):
         # tele_sorted_list = sorted(b, key=lambda d: d[0])
         # Analyze new state
 
-        diamonds = find_diamond(current_position, board)
+        all_diamonds = [x for x in board.game_objects if (x.type=="DiamondGameObject")]
         base = board_bot.properties.base
         current_position = board_bot.position
 
         x = []
         y = []
 
-        for position in diamonds:
+        for position in all_diamonds:
             posX = abs(base.x  - position.position.x)
             posY = abs(base.y - position.position.y)
             distance = (abs(base.x  - position.position.x) + abs(base.y - position.position.y))
@@ -59,8 +59,8 @@ class NearestBase(BaseLogic):
             y.append([distance1,position.position,[posX,posY],position.properties.points])
 
         diamond_distance_sums = []
-        for diamond in diamonds:
-            total_distance = sum(abs(diamond.position.x - other_diamond.position.x) + abs(diamond.position.y - other_diamond.position.y) for other_diamond in diamonds if other_diamond != diamond)
+        for diamond in all_diamonds:
+            total_distance = sum(abs(diamond.position.x - other_diamond.position.x) + abs(diamond.position.y - other_diamond.position.y) for other_diamond in all_diamonds if other_diamond != diamond)
             diamond_distance_sums.append([total_distance, diamond.position])
             
         diamond_sorted_base = sorted(x, key=lambda d: d[0])
@@ -69,10 +69,10 @@ class NearestBase(BaseLogic):
         board_width = board.width
         board_height = board.height
 
-        red_button = find_red_button(current_position, board)
+        red_button = [x for x in board.game_objects if (x.type=="DiamondButtonGameObject")]
+        
         z = []
         a = []
-
         for position in red_button:
             distance = (abs(base.x  - position.position.x) + abs(base.y - position.position.y))
             z.append([distance,position.position])
@@ -83,14 +83,7 @@ class NearestBase(BaseLogic):
         red_button_sorted_bot = sorted(a, key=lambda d: d[0])
         base_distance = abs(current_position.x - board_bot.properties.base.x) + abs(current_position.y - board_bot.properties.base.y)
         
-        bot_enemy = [x for x in board.game_objects if (x.type=="BotGameObject" and x.id != board_bot.id)]
-        print(bot_enemy)
-        k = []
-        for position in bot_enemy:
-            distance = (abs(current_position.x  - position.position.x) + abs(current_position.y - position.position.y))
-            k.append([distance,position.position])
 
-        bot_enemy_sorted =  sorted(k, key=lambda d: d[0])
         if props.diamonds >= 4:
             # Move to 
             if(diamond_sorted_bot[0][0] <= 2 and props.diamonds + diamond_sorted_bot[0][3] <= 5):
@@ -102,11 +95,8 @@ class NearestBase(BaseLogic):
 
             
             # base_distance_tele = tele_sorted_list[0][0] + abs(tele_sorted_list[1][1].x - board_bot.properties.base.x) + abs(tele_sorted_list[1][1].y - board_bot.properties.base.y)
-
             if(base_distance == 1 and props.diamonds >= 1):
                 self.goal_position = base
-            elif(bot_enemy_sorted and bot_enemy_sorted[0][0] <= 1 and props.diamonds < 2 ):
-                self.goal_position = bot_enemy_sorted[0][1]
             elif(board_bot.properties.milliseconds_left <= 8000 and props.diamonds >= 2):
                 if(diamond_sorted_bot[0][0] <= 1 ):
                     self.goal_position = diamond_sorted_bot[0][1]
@@ -127,7 +117,7 @@ class NearestBase(BaseLogic):
                     if(red_button_sorted_base != []):
                         if(red_button_sorted_base[0][0] < (0.5 * board_width +  0.5 * board_height)):
                             self.goal_position = red_button_sorted_base[0][1]
-                        elif(red_button_sorted_bot[0][0] <= 3 and len(diamonds) < 4):
+                        elif(red_button_sorted_bot[0][0] <= 3 and len(all_diamonds) < 4):
                             self.goal_position = red_button_sorted_bot[0][1]
                         elif diamond_sorted_by_density:
                             if(diamond_sorted_bot[0][0] <= 2):
