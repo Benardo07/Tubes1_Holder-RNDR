@@ -105,3 +105,40 @@ def find_densest(diamonds, eps=1, min_samples=3):
                     if neighbor not in cluster:
                         cluster.append(neighbor)
     return clusters
+
+def getAllTeleporterSorted(board,current_position):
+    teleport = [x for x in board.game_objects if (x.type == "TeleportGameObject")]
+# Group teleporters by their pair_id
+    teleport_groups = {}
+    for teleporter in teleport:
+        pair_id = teleporter.properties.pair_id
+        if pair_id not in teleport_groups:
+            teleport_groups[pair_id] = []
+        teleport_groups[pair_id].append(teleporter)
+
+    # Sort each group of teleporters by their distance to the bot and store the distance
+    sorted_teleport_groups = {}
+    for pair_id, teleporters in teleport_groups.items():
+        sorted_teleporters = sorted([(teleporter.position, abs(current_position.x - teleporter.position.x) + abs(current_position.y - teleporter.position.y)) for teleporter in teleporters], key=lambda t: t[1])
+        sorted_teleport_groups[pair_id] = sorted_teleporters
+
+    # Sort the sorted_teleport_groups dictionary based on the distance of the nearest teleporter in each group
+    sorted_teleport_groups = dict(sorted(sorted_teleport_groups.items(), key=lambda item: item[1][0][1]))
+
+    return sorted_teleport_groups
+
+def findDistanceByBotAndBase(object,base,current_position):
+    x = []
+    y = []
+
+    for position in object:
+        posX = abs(base.x  - position.position.x)
+        posY = abs(base.y - position.position.y)
+        distance = (abs(base.x  - position.position.x) + abs(base.y - position.position.y))
+        x.append([distance,position.position,[posX,posY],position.properties.points])
+        posX = abs(current_position.x  - position.position.x)
+        posY = abs(current_position.y - position.position.y)
+        distance1 = (abs(current_position.x  - position.position.x) + abs(current_position.y - position.position.y))
+        y.append([distance1,position.position,[posX,posY],position.properties.points])
+
+    return x,y
