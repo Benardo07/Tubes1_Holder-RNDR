@@ -16,7 +16,7 @@ class TackleBot(BaseLogic):
         props = board_bot.properties
 
         # If diamonds are full, set goal position to base
-        if props.diamonds >= 4 and (props.milliseconds_left < 10000 and props.diamonds != 0):
+        if props.diamonds >= 4 or (props.milliseconds_left < 10000 and props.diamonds != 0):
             self.goal_position = props.base
             delta_x, delta_y = self.get_direction_to_target(current_position, self.goal_position)
             return delta_x, delta_y
