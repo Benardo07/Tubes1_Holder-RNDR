@@ -39,43 +39,73 @@ class PointDiamond(BaseLogic):
 
         # Sort the sorted_teleport_groups dictionary based on the distance of the nearest teleporter in each group
         sorted_teleport_groups = dict(sorted(sorted_teleport_groups.items(), key=lambda item: item[1][0][1]))
+        base = board_bot.properties.base
+
+        all_diamonds = [x for x in board.game_objects if (x.type=="DiamondGameObject")]
+        blueDiamond = [x for x in board.game_objects if (x.type=="DiamondGameObject" and x.properties.points == 1)]
+        redDiamond = [x for x in board.game_objects if (x.type=="DiamondGameObject" and x.properties.points == 2)]
+
+        x = []
+        y = []
+        z = []
+
+        for position in redDiamond :
+            
+            distance = (abs(current_position.x  - position.position.x) + abs(current_position.y - position.position.y))
+            
+            x.append([distance, position.position])
+
+        for position in blueDiamond :
+            distance1 = (abs(current_position.x - position.position.x) + abs(current_position.y - position.position.y))
+            y.append([distance1,position.position])
+
+        for position in all_diamonds :
+            posX = abs(base.x  - position.position.x)
+            posY = abs(base.y - position.position.y)
+            distance = (abs(current_position.x  - position.position.x) + abs(current_position.y - position.position.y))
+            z.append([distance,position.position,[posX,posY],position.properties.points])
+
+        blue_sorted_list = sorted(y, key=lambda d: d[0])            
+        red_sorted_list = sorted(x, key=lambda d: d[0])
+        all_diamond_sorted_list = sorted(z,key=lambda d: d[0])
+        base_distance = abs(current_position.x - board_bot.properties.base.x) + abs(current_position.y - board_bot.properties.base.y)
 
         # Analyze new state
-        if props.diamonds == 5:
+        if props.diamonds >= 4:
             # Move to base
-            base = board_bot.properties.base
-            self.goal_position = base
+            if(all_diamond_sorted_list[0][0] <= 1 and (props.diamonds + all_diamond_sorted_list[0][3] <= 5)):
+                    self.goal_position = all_diamond_sorted_list[0][1]
+            else:
+                self.goal_position = base
         else:
             # Just roam around
             # red_diamond = [x for x in board.game_objects if x.type=="DiamondButtonGameObject"]
-            blueDiamond = [x for x in board.game_objects if (x.type=="DiamondGameObject" and x.properties.points == 1)]
-            redDiamond = [x for x in board.game_objects if (x.type=="DiamondGameObject" and x.properties.points == 2)]
+            
+            if(base_distance == 1 and props.diamonds >= 1):
+                self.goal_position = base
+            elif(board_bot.properties.milliseconds_left <= 8000 and props.diamonds >= 2):
+                if(all_diamond_sorted_list[0][0] <= 1 and (props.diamonds + all_diamond_sorted_list[0][3] <= 5)):
+                    self.goal_position = all_diamond_sorted_list[0][1]
+                else:
+                    self.goal_position = base
+            elif(red_sorted_list and blue_sorted_list):
+                if(blue_sorted_list[0][0] <= 2):
+                    self.goal_position = blue_sorted_list[0][1]
+                elif(red_sorted_list != [] and props.diamonds <=3):
+                    self.goal_position = red_sorted_list[0][1]
+                else:
 
-            x = []
-            y = []
-
-            for position in redDiamond :
-                distance = (abs(current_position.x  - position.position.x) + abs(current_position.y - position.position.y))
-                x.append([distance, position.position])
-
-            for position in blueDiamond :
-                distance1 = (abs(current_position.x - position.position.x) + abs(current_position.y - position.position.y))
-                y.append([distance1,position.position])
-
-
-            blue_sorted_list = sorted(y, key=lambda d: d[0])            
-            red_sorted_list = sorted(x, key=lambda d: d[0])
-            base_distance = abs(current_position.x - board_bot.properties.base.x) + abs(current_position.y - board_bot.properties.base.y)
-            base_distance_tele = tele_sorted_list[0][0] + abs(tele_sorted_list[1][1].x - board_bot.properties.base.x) + abs(tele_sorted_list[1][1].y - board_bot.properties.base.y)
-
-            if(blue_sorted_list[0][0] <= 2):
-                self.goal_position = blue_sorted_list[0][1]
-            elif(red_sorted_list != [] and props.diamonds <=3):
-                self.goal_position = red_sorted_list[0][1]
-            elif(props.diamonds >= 3 and (base_distance <= 2 or base_distance_tele <= 3)):
+                    if(all_diamond_sorted_list[0][0] <= 1 and (props.diamonds + all_diamond_sorted_list[0][3] <= 5)):
+                        self.goal_position = all_diamond_sorted_list[0][1]
+                    else:
+                        self.goal_position = base
+            elif(props.diamonds >= 3 and (base_distance <= 2 )):
                 self.goal_position = board_bot.properties.base
             else:
-                self.goal_position = blue_sorted_list[0][1]
+                if(all_diamond_sorted_list):
+                    self.goal_position = all_diamond_sorted_list[0][1]
+                else:
+                    self.goal_position = None
         current_position = board_bot.position
         if self.goal_position:
 
@@ -118,4 +148,6 @@ class PointDiamond(BaseLogic):
                 self.current_direction = (self.current_direction + 1) % len(
                     self.directions
                 )
+        if(delta_x == 0 and delta_y == 0) :
+            delta_x, delta_y = random.choice([(1, 0), (0, 1), (-1, 0), (0, -1)])
         return delta_x, delta_y

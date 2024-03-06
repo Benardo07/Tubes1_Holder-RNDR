@@ -5,7 +5,7 @@ from game.logic.base import BaseLogic
 from game.models import GameObject, Board, Position
 from ..util import *
 
-class NewBot(BaseLogic):
+class NearestBase(BaseLogic):
     def __init__(self):
         self.directions = [(1, 0), (0, 1), (-1, 0), (0, -1)]
         self.goal_position: Optional[Position] = None
@@ -14,73 +14,41 @@ class NewBot(BaseLogic):
     def next_move(self, board_bot: GameObject, board: Board):
         props = board_bot.properties
 
-        teleport = [x for x in board.game_objects if (x.type == "TeleportGameObject")]
+        
         current_position = board_bot.position
-# Group teleporters by their pair_id
-        teleport_groups = {}
-        for teleporter in teleport:
-            pair_id = teleporter.properties.pair_id
-            if pair_id not in teleport_groups:
-                teleport_groups[pair_id] = []
-            teleport_groups[pair_id].append(teleporter)
+        base = board_bot.properties.base
+        
 
-        # Sort each group of teleporters by their distance to the bot and store the distance
-        sorted_teleport_groups = {}
-        for pair_id, teleporters in teleport_groups.items():
-            sorted_teleporters = sorted([(teleporter.position, abs(current_position.x - teleporter.position.x) + abs(current_position.y - teleporter.position.y)) for teleporter in teleporters], key=lambda t: t[1])
-            sorted_teleport_groups[pair_id] = sorted_teleporters
-
-        # Sort the sorted_teleport_groups dictionary based on the distance of the nearest teleporter in each group
-        sorted_teleport_groups = dict(sorted(sorted_teleport_groups.items(), key=lambda item: item[1][0][1]))
-        print("ini ben")
-        # b = []
-        # teleport = [x for x in board.game_objects if (x.type=="TeleportGameObject")]
-        # for position in teleport :
-        #     distance2 = (abs(current_position.x - position.position.x) + abs(current_position.y - position.position.y))
-        #     b.append([distance2,position.position])
-        # tele_sorted_list = sorted(b, key=lambda d: d[0])
-        # Analyze new state
+        sorted_teleport_groups = getAllTeleporterSorted(board,current_position)
 
         all_diamonds = [x for x in board.game_objects if (x.type=="DiamondGameObject")]
-        base = board_bot.properties.base
-        current_position = board_bot.position
+        red_button = [x for x in board.game_objects if (x.type=="DiamondButtonGameObject")]
 
-        x = []
-        y = []
+        
+        
+        cluster = find_densest(all_diamonds)
+        # Find the densest cluster
+        densest_cluster = max(cluster, key=len, default=[])
+        # Calculate the centroid of the densest cluster
+        if densest_cluster:
+            centroid_x = sum(d.position.x for d in densest_cluster) / len(densest_cluster)
+            centroid_y = sum(d.position.y for d in densest_cluster) / len(densest_cluster)
+            densest_centroid = Position(x=int(centroid_x), y=int(centroid_y))
+        else:
+            densest_centroid = None
 
-        for position in all_diamonds:
-            posX = abs(base.x  - position.position.x)
-            posY = abs(base.y - position.position.y)
-            distance = (abs(base.x  - position.position.x) + abs(base.y - position.position.y))
-            x.append([distance,position.position,[posX,posY],position.properties.points])
-            posX = abs(current_position.x  - position.position.x)
-            posY = abs(current_position.y - position.position.y)
-            distance1 = (abs(current_position.x  - position.position.x) + abs(current_position.y - position.position.y))
-            y.append([distance1,position.position,[posX,posY],position.properties.points])
 
-        diamond_distance_sums = []
-        for diamond in all_diamonds:
-            total_distance = sum(abs(diamond.position.x - other_diamond.position.x) + abs(diamond.position.y - other_diamond.position.y) for other_diamond in all_diamonds if other_diamond != diamond)
-            diamond_distance_sums.append([total_distance, diamond.position])
-            
-        diamond_sorted_base = sorted(x, key=lambda d: d[0])
-        diamond_sorted_bot = sorted(y, key=lambda d: d[0])
-        diamond_sorted_by_density = sorted(diamond_distance_sums, key=lambda d: d[0])
+        diamond_distance_base , diamond_distance_bot = findDistanceByBotAndBase(all_diamonds,base,current_position)   
+        red_button_base , red_button_bot = findDistanceByBotAndBase(red_button,base,current_position)
+        diamond_sorted_base = sorted(diamond_distance_base, key=lambda d: d[0])
+        diamond_sorted_bot = sorted(diamond_distance_bot, key=lambda d: d[0])
+    
         board_width = board.width
         board_height = board.height
 
-        red_button = [x for x in board.game_objects if (x.type=="DiamondButtonGameObject")]
+        red_button_sorted_base =  sorted(red_button_base, key=lambda d: d[0])
+        red_button_sorted_bot = sorted(red_button_bot, key=lambda d: d[0])
         
-        z = []
-        a = []
-        for position in red_button:
-            distance = (abs(base.x  - position.position.x) + abs(base.y - position.position.y))
-            z.append([distance,position.position])
-            distance = (abs(current_position.x  - position.position.x) + abs(current_position.y - position.position.y))
-            a.append([distance,position.position])
-        
-        red_button_sorted_base =  sorted(z, key=lambda d: d[0])
-        red_button_sorted_bot = sorted(a, key=lambda d: d[0])
         base_distance = abs(current_position.x - board_bot.properties.base.x) + abs(current_position.y - board_bot.properties.base.y)
         
 
@@ -95,7 +63,7 @@ class NewBot(BaseLogic):
 
             
             # base_distance_tele = tele_sorted_list[0][0] + abs(tele_sorted_list[1][1].x - board_bot.properties.base.x) + abs(tele_sorted_list[1][1].y - board_bot.properties.base.y)
-            if(base_distance == 1 and props.diamonds >= 1):
+            if(base_distance == 1 and props.diamonds >= 2):
                 self.goal_position = base
             elif(board_bot.properties.milliseconds_left <= 8000 and props.diamonds >= 2):
                 if(diamond_sorted_bot[0][0] <= 1 ):
@@ -107,23 +75,19 @@ class NewBot(BaseLogic):
                     self.goal_position = base
                 elif(diamond_sorted_bot[0][0] <= 2) :
                     self.goal_position = diamond_sorted_bot[0][1]
-                elif((diamond_sorted_base[0][2][0] < 0.5 * board_width) and  (diamond_sorted_base[0][2][1] <  0.5 * board_height)) :
+                elif((diamond_sorted_base[0][2][0] < 0.4 * board_width) and  (diamond_sorted_base[0][2][1] <  0.4 * board_height)) :
                     if(diamond_sorted_bot[0][0] <= 2 ):
                         self.goal_position = diamond_sorted_bot[0][1]
                     else:
                         self.goal_position = diamond_sorted_base[0][1]
-
+                elif(densest_centroid):
+                    self.goal_position = densest_centroid
                 else:
                     if(red_button_sorted_base != []):
-                        if(red_button_sorted_base[0][0] < (0.5 * board_width +  0.5 * board_height)):
+                        if((red_button_sorted_base[0][2][0] < 0.4 * board_width) and (red_button_sorted_base[0][2][1] < 0.4 * board_height)):
                             self.goal_position = red_button_sorted_base[0][1]
-                        elif(red_button_sorted_bot[0][0] <= 3 and len(all_diamonds) < 4):
+                        elif(red_button_sorted_bot[0][0] <= 3):
                             self.goal_position = red_button_sorted_bot[0][1]
-                        elif diamond_sorted_by_density:
-                            if(diamond_sorted_bot[0][0] <= 2):
-                                self.goal_position = diamond_sorted_bot[0][1]
-                            else:
-                                self.goal_position = diamond_sorted_by_density[0][1]
                         else:
                             self.goal_position = diamond_sorted_bot[0][1]
             else:
@@ -179,8 +143,7 @@ class NewBot(BaseLogic):
                 self.current_direction = (self.current_direction + 1) % len(
                     self.directions
                 )
-        print(current_position)
-        print(self.goal_position)
+
         if(delta_x == 0 and delta_y == 0) :
             delta_x, delta_y = random.choice([(1, 0), (0, 1), (-1, 0), (0, -1)])
         return delta_x, delta_y
