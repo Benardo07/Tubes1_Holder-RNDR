@@ -49,7 +49,7 @@ class NearestBase(BaseLogic):
         red_button_sorted_base =  sorted(red_button_base, key=lambda d: d[0])
         red_button_sorted_bot = sorted(red_button_bot, key=lambda d: d[0])
         
-        base_distance = abs(current_position.x - board_bot.properties.base.x) + abs(current_position.y - board_bot.properties.base.y)
+        base_distance = count_distance(current_position.x, current_position.y, board_bot.properties.base.x, board_bot.properties.base.y)
         
 
         if props.diamonds >= 4:
@@ -75,7 +75,7 @@ class NearestBase(BaseLogic):
                     self.goal_position = base
                 elif(diamond_sorted_bot[0][0] <= 2) :
                     self.goal_position = diamond_sorted_bot[0][1]
-                elif((diamond_sorted_base[0][2][0] < 0.4 * board_width) and  (diamond_sorted_base[0][2][1] <  0.4 * board_height)) :
+                # elif((diamond_sorted_base[0][2][0] < 0.4 * board_width) and  (diamond_sorted_base[0][2][1] <  0.4 * board_height)) :
                     if(diamond_sorted_bot[0][0] <= 2 ):
                         self.goal_position = diamond_sorted_bot[0][1]
                     else:
@@ -100,7 +100,7 @@ class NearestBase(BaseLogic):
     
         current_position = board_bot.position
         if self.goal_position:
-            shortest_way = abs(current_position.x - self.goal_position.x) + abs(current_position.y - self.goal_position.y)
+            shortest_way = count_distance(current_position.x, current_position.y, self.goal_position.x, self.goal_position.y)
             shortest_way_position = self.goal_position
 
             # Iterate over each pair of teleporters
@@ -110,7 +110,7 @@ class NearestBase(BaseLogic):
                 second_teleporter = teleporters[1][0]
 
                 # Calculate the distance from the second teleporter in the pair to the goal position
-                distance_tele2_goal = abs(second_teleporter.x - self.goal_position.x) + abs(second_teleporter.y - self.goal_position.y)
+                distance_tele2_goal = count_distance(second_teleporter.x, second_teleporter.y, self.goal_position.x, self.goal_position.y)
 
                 # Calculate the total distance if using this teleporter pair
                 way1 = distance_to_closest_teleporter + distance_tele2_goal
@@ -139,6 +139,7 @@ class NearestBase(BaseLogic):
             delta = self.directions[self.current_direction]
             delta_x = delta[0]
             delta_y = delta[1]
+            
             if random.random() > 0.6:
                 self.current_direction = (self.current_direction + 1) % len(
                     self.directions
