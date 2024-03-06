@@ -48,7 +48,10 @@ class ShortestDistance(BaseLogic):
                 self.goal_position = board_bot.properties.base
 
             elif (props.diamonds >= 3 and (base_distance <= 6 or base_distance_tele <= 6) and sorted_list[0][0] <= 5):
-                self.goal_position = sorted_list[0][1]
+                if (props.diamonds == 4):
+                    self.goal_position = sorted_blue[0][1]
+                else :
+                    self.goal_position = sorted_list[0][1]
 
             elif (props.diamonds == 4 and sorted_blue != []):
                 self.goal_position = sorted_blue[0][1]
