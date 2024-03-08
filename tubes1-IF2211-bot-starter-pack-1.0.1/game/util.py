@@ -11,7 +11,6 @@ def get_direction(current_x, current_y, dest_x, dest_y):
         delta_y = 0
     return (delta_x, delta_y)
 
-
 def position_equals(a: Position, b: Position):
     return a.x == b.x and a.y == b.y
 
@@ -63,17 +62,6 @@ def find_diamond(current_position, board: Board):
 def calc_distance(obj1, obj2):
     return abs(obj1.x - obj2.x) + abs(obj1.y - obj2.y)
 
-def find_clusters(diamonds, threshold=3):  
-    clusters = []
-    for diamond in diamonds:
-        for cluster in clusters:
-            if any(calc_distance(diamond.position, d.position) <= threshold for d in cluster):
-                cluster.append(diamond)
-                break
-        else:
-            clusters.append([diamond])
-    return clusters
-
 def find_densest(diamonds, eps=1, min_samples=3):
     clusters = []
     visited = set()
@@ -108,7 +96,8 @@ def find_densest(diamonds, eps=1, min_samples=3):
 
 def getAllTeleporterSorted(board,current_position):
     teleport = [x for x in board.game_objects if (x.type == "TeleportGameObject")]
-# Group teleporters by their pair_id
+    
+    # Group teleporters by their pair_id
     teleport_groups = {}
     for teleporter in teleport:
         pair_id = teleporter.properties.pair_id

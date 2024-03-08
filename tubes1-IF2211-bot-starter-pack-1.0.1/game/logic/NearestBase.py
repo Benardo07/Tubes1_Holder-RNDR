@@ -1,6 +1,5 @@
 import random
 from typing import Optional
-
 from game.logic.base import BaseLogic
 from game.models import GameObject, Board, Position
 from ..util import *
@@ -13,22 +12,18 @@ class NearestBase(BaseLogic):
 
     def next_move(self, board_bot: GameObject, board: Board):
         props = board_bot.properties
-
-        
         current_position = board_bot.position
         base = board_bot.properties.base
         
-
         sorted_teleport_groups = getAllTeleporterSorted(board,current_position)
 
         all_diamonds = [x for x in board.game_objects if (x.type=="DiamondGameObject")]
         red_button = [x for x in board.game_objects if (x.type=="DiamondButtonGameObject")]
-
         
-        
-        cluster = find_densest(all_diamonds)
         # Find the densest cluster
+        cluster = find_densest(all_diamonds)
         densest_cluster = max(cluster, key=len, default=[])
+
         # Calculate the centroid of the densest cluster
         if densest_cluster:
             centroid_x = sum(d.position.x for d in densest_cluster) / len(densest_cluster)
@@ -36,7 +31,6 @@ class NearestBase(BaseLogic):
             densest_centroid = Position(x=int(centroid_x), y=int(centroid_y))
         else:
             densest_centroid = None
-
 
         diamond_distance_base , diamond_distance_bot = findDistanceByBotAndBase(all_diamonds,base,current_position)   
         red_button_base , red_button_bot = findDistanceByBotAndBase(red_button,base,current_position)
@@ -51,7 +45,6 @@ class NearestBase(BaseLogic):
         
         base_distance = count_distance(current_position.x, current_position.y, board_bot.properties.base.x, board_bot.properties.base.y)
         
-
         if props.diamonds >= 4:
             # Move to 
             if(diamond_sorted_bot[0][0] <= 2 and props.diamonds + diamond_sorted_bot[0][3] <= 5):
@@ -60,12 +53,9 @@ class NearestBase(BaseLogic):
                 base = board_bot.properties.base
                 self.goal_position = base
         else:
-
-            
-            # base_distance_tele = tele_sorted_list[0][0] + abs(tele_sorted_list[1][1].x - board_bot.properties.base.x) + abs(tele_sorted_list[1][1].y - board_bot.properties.base.y)
             if(base_distance == 1 and props.diamonds >= 2):
                 self.goal_position = base
-            elif(board_bot.properties.milliseconds_left <= 8000 and props.diamonds >= 2):
+            elif(board_bot.properties.milliseconds_left <= 8000 and props.diamonds >= 1):
                 if(diamond_sorted_bot[0][0] <= 1 ):
                     self.goal_position = diamond_sorted_bot[0][1]
                 else:
@@ -75,7 +65,7 @@ class NearestBase(BaseLogic):
                     self.goal_position = base
                 elif(diamond_sorted_bot[0][0] <= 2) :
                     self.goal_position = diamond_sorted_bot[0][1]
-                # elif((diamond_sorted_base[0][2][0] < 0.4 * board_width) and  (diamond_sorted_base[0][2][1] <  0.4 * board_height)) :
+                elif((diamond_sorted_base[0][2][0] < 0.4 * board_width) and  (diamond_sorted_base[0][2][1] <  0.4 * board_height)) :
                     if(diamond_sorted_bot[0][0] <= 2 ):
                         self.goal_position = diamond_sorted_bot[0][1]
                     else:
@@ -96,8 +86,6 @@ class NearestBase(BaseLogic):
                 else:
                     self.goal_position = red_button
 
-
-    
         current_position = board_bot.position
         if self.goal_position:
             shortest_way = count_distance(current_position.x, current_position.y, self.goal_position.x, self.goal_position.y)
@@ -121,7 +109,7 @@ class NearestBase(BaseLogic):
                     shortest_way_position = closest_teleporter
 
 
-# Update the goal position to the shortest way position
+            # Update the goal position to the shortest way position
             if(current_position == shortest_way_position):
                 delta_x, delta_y = random.choice([(1, 0), (0, 1), (-1, 0), (0, -1)])
             else:
@@ -132,8 +120,6 @@ class NearestBase(BaseLogic):
                     self.goal_position.x,
                     self.goal_position.y,
                 )
-            # We are aiming for a specific position, calculate delta
-            
         else:
             # Roam around
             delta = self.directions[self.current_direction]

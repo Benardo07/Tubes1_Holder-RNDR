@@ -25,7 +25,6 @@ class ShortestDistance(BaseLogic):
             self.goal_position = base
         else:
             # Just roam around
-            # red_diamond = [x for x in board.game_objects if x.type=="DiamondButtonGameObject"]
             diamond = find_diamond(current_position, board)
             red_diamond = find_red_diamond(current_position, board)
             blue_diamond = find_blue_diamond(current_position, board)
@@ -62,15 +61,6 @@ class ShortestDistance(BaseLogic):
             elif (sorted_blue != [] and sorted_red != [] and props.diamonds < 4):
                 if (sorted_red[0][0] <= sorted_blue[0][0]) :
                     self.goal_position = sorted_red[0][1]
-
-            # elif ((abs(current_position.x - sorted_list[0][1].position.x) >= 9)or(abs(current_position.y - sorted_list[0][1].position.y) >= 9)) :
-            #     if((abs(current_position.x - sorted_button[0][1].position.x) <= 9)or(abs(current_position.y - sorted_button[0][1].position.y) <= 9)) :
-            #         self.goal_position = sorted_button[0][1]
-            #     elif((abs(current_position.x - sorted_button[0][1].position.x) >= 9)or(abs(current_position.y - sorted_button[0][1].position.y) >= 9)):
-            #         self.goal_position = sorted_list[0][1]
-
-            #     else :
-            #         self.goal_position = sorted_list[0][1]
                     
         current_position = board_bot.position
         if self.goal_position:
@@ -92,13 +82,5 @@ class ShortestDistance(BaseLogic):
         
         if(delta_x == 0 and delta_y == 0):
             delta_x, delta_y = random.choice([(1, 0), (0, 1), (-1, 0), (0, -1)])
-        # else:
-        #     # Roam around
-        #     delta = self.directions[self.current_direction]
-        #     delta_x = delta[0]
-        #     delta_y = delta[1]
-        #     if random.random() > 0.6:
-        #         self.current_direction = (self.current_direction + 1) % len(
-        #             self.directions
-        #         )
+
         return delta_x, delta_y

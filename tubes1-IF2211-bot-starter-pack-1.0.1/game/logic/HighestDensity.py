@@ -15,27 +15,12 @@ class HighestDensity(BaseLogic):
         current_position = board_bot.position
 
         # Gather game objects
-        teleport = [x for x in board.game_objects if (x.type == "TeleportGameObject")]
         blue_diamonds = [x for x in board.game_objects if x.type == "DiamondGameObject" and x.properties.points == 1]
         red_diamonds = [x for x in board.game_objects if x.type == "DiamondGameObject" and x.properties.points == 2]
         all_diamonds = blue_diamonds + red_diamonds
 
-        # Group teleporters by their pair_id
-        teleport_groups = {}
-        for teleporter in teleport:
-            pair_id = teleporter.properties.pair_id
-            if pair_id not in teleport_groups:
-                teleport_groups[pair_id] = []
-            teleport_groups[pair_id].append(teleporter)
-
         # Sort each group of teleporters by their distance to the bot and store the distance
-        sorted_teleport_groups = {}
-        for pair_id, teleporters in teleport_groups.items():
-            sorted_teleporters = sorted([(teleporter.position, calc_distance(current_position, teleporter.position)) for teleporter in teleporters], key=lambda t: t[1])
-            sorted_teleport_groups[pair_id] = sorted_teleporters
-
-        # Sort the sorted_teleport_groups dictionary based on the distance of the nearest teleporter in each group
-        sorted_teleport_groups = dict(sorted(sorted_teleport_groups.items(), key=lambda item: item[1][0][1]))
+        sorted_teleport_groups = getAllTeleporterSorted(board,current_position)
 
         # Sort blue and red diamonds by their distance to the bot, and store the distance
         blue_sorted = sorted([(diamond, calc_distance(current_position, diamond.position)) for diamond in blue_diamonds], key=lambda t: t[1])
