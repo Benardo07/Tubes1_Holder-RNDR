@@ -12,32 +12,31 @@ class ShortestDistance(BaseLogic):
         self.current_direction = 0
 
     def next_move(self, board_bot: GameObject, board: Board):
-
         props = board_bot.properties
         current_position = board_bot.position
+
+        # Find all teleport and the distance
         teleport = find_teleport(current_position, board)
         tele_sorted_list = sorted(teleport, key=lambda d: d[0])
-        
-        # Analyze new state
+
+        # Find all diamonds, red diamonds, blue diamonds and the distance
+        diamond = find_diamond(current_position, board)
+        red_diamond = find_red_diamond(current_position, board)
+        blue_diamond = find_blue_diamond(current_position, board)
+        sorted_list = sorted(diamond, key=lambda d: d[0])
+        sorted_blue = sorted(blue_diamond, key=lambda d: d[0])
+        sorted_red = sorted(red_diamond, key=lambda d: d[0])
+
+        # Count base distance from bot and teleporter
+        base_distance = abs(current_position.x - board_bot.properties.base.x) + abs(current_position.y - board_bot.properties.base.y)
+        base_distance_tele = tele_sorted_list[0][0] + abs(tele_sorted_list[1][1].x - board_bot.properties.base.x) + abs(tele_sorted_list[1][1].y - board_bot.properties.base.y)
+
+        # Goals condition
         if props.diamonds == 5:
             # Move to base
             base = board_bot.properties.base
             self.goal_position = base
         else:
-            # Just roam around
-            diamond = find_diamond(current_position, board)
-            red_diamond = find_red_diamond(current_position, board)
-            blue_diamond = find_blue_diamond(current_position, board)
-            red_button = find_red_button(current_position,board)
-
-            sorted_list = sorted(diamond, key=lambda d: d[0])
-            sorted_blue = sorted(blue_diamond, key=lambda d: d[0])
-            sorted_red = sorted(red_diamond, key=lambda d: d[0])
-            sorted_button = sorted(red_button, key=lambda d: d[0])
-            base_distance = abs(current_position.x - board_bot.properties.base.x) + abs(current_position.y - board_bot.properties.base.y)
-            base_distance_tele = tele_sorted_list[0][0] + abs(tele_sorted_list[1][1].x - board_bot.properties.base.x) + abs(tele_sorted_list[1][1].y - board_bot.properties.base.y)
-
-
             self.goal_position = sorted_list[0][1]
 
             if(props.diamonds >= 3 and (base_distance <= 6 or base_distance_tele <= 6) and sorted_list[0][0] >= 5):
@@ -80,6 +79,7 @@ class ShortestDistance(BaseLogic):
                 self.goal_position.y,
             )
         
+        # When bot stuck
         if(delta_x == 0 and delta_y == 0):
             delta_x, delta_y = random.choice([(1, 0), (0, 1), (-1, 0), (0, -1)])
 

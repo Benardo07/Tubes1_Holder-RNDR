@@ -15,14 +15,25 @@ class NearestBase(BaseLogic):
         current_position = board_bot.position
         base = board_bot.properties.base
         
-        sorted_teleport_groups = getAllTeleporterSorted(board,current_position)
+        board_width = board.width
+        board_height = board.height
 
+        # Find all diamonds and red button in board
         all_diamonds = [x for x in board.game_objects if (x.type=="DiamondGameObject")]
         red_button = [x for x in board.game_objects if (x.type=="DiamondButtonGameObject")]
         
         # Find the densest cluster
         cluster = find_densest(all_diamonds)
         densest_cluster = max(cluster, key=len, default=[])
+        
+        diamond_distance_base , diamond_distance_bot = findDistanceByBotAndBase(all_diamonds,base,current_position)   
+        red_button_base , red_button_bot = findDistanceByBotAndBase(red_button,base,current_position)
+        diamond_sorted_base = sorted(diamond_distance_base, key=lambda d: d[0])
+        diamond_sorted_bot = sorted(diamond_distance_bot, key=lambda d: d[0])
+        red_button_sorted_base = sorted(red_button_base, key=lambda d: d[0])
+        red_button_sorted_bot = sorted(red_button_bot, key=lambda d: d[0])
+        base_distance = count_distance(current_position.x, current_position.y, board_bot.properties.base.x, board_bot.properties.base.y)
+        sorted_teleport_groups = getAllTeleporterSorted(board,current_position)
 
         # Calculate the centroid of the densest cluster
         if densest_cluster:
@@ -31,22 +42,9 @@ class NearestBase(BaseLogic):
             densest_centroid = Position(x=int(centroid_x), y=int(centroid_y))
         else:
             densest_centroid = None
-
-        diamond_distance_base , diamond_distance_bot = findDistanceByBotAndBase(all_diamonds,base,current_position)   
-        red_button_base , red_button_bot = findDistanceByBotAndBase(red_button,base,current_position)
-        diamond_sorted_base = sorted(diamond_distance_base, key=lambda d: d[0])
-        diamond_sorted_bot = sorted(diamond_distance_bot, key=lambda d: d[0])
-    
-        board_width = board.width
-        board_height = board.height
-
-        red_button_sorted_base =  sorted(red_button_base, key=lambda d: d[0])
-        red_button_sorted_bot = sorted(red_button_bot, key=lambda d: d[0])
         
-        base_distance = count_distance(current_position.x, current_position.y, board_bot.properties.base.x, board_bot.properties.base.y)
-        
+        # Goals condition
         if props.diamonds >= 4:
-            # Move to 
             if(diamond_sorted_bot[0][0] <= 2 and props.diamonds + diamond_sorted_bot[0][3] <= 5):
                 self.goal_position = diamond_sorted_bot[0][1]
             else:
@@ -92,7 +90,7 @@ class NearestBase(BaseLogic):
             shortest_way_position = self.goal_position
 
             # Iterate over each pair of teleporters
-            for pair_id, teleporters in sorted_teleport_groups.items():
+            for teleporters in sorted_teleport_groups.items():
                 closest_teleporter, distance_to_closest_teleporter = teleporters[0]
                 print(closest_teleporter)
                 second_teleporter = teleporters[1][0]
@@ -131,6 +129,7 @@ class NearestBase(BaseLogic):
                     self.directions
                 )
 
+        # When bot stuck
         if(delta_x == 0 and delta_y == 0) :
             delta_x, delta_y = random.choice([(1, 0), (0, 1), (-1, 0), (0, -1)])
         return delta_x, delta_y

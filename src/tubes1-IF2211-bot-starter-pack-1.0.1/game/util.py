@@ -14,11 +14,13 @@ def get_direction(current_x, current_y, dest_x, dest_y):
 def position_equals(a: Position, b: Position):
     return a.x == b.x and a.y == b.y
 
+# Calculate distance from 
 def count_distance(current_x, current_y, dest_x, dest_y):
     delta_x = dest_x - current_x
     delta_y = dest_y - current_y
     return (abs(delta_x) + abs(delta_y))
 
+# Find all teleport and the distance from the bot
 def find_teleport(current_position, board: Board):
     teleport = [t for t in board.game_objects if (t.type=="TeleportGameObject")]
     list_teleport = []
@@ -27,6 +29,7 @@ def find_teleport(current_position, board: Board):
         list_teleport.append([distance,position.position])
     return list_teleport
 
+# Find red button and the distance from the bot
 def find_red_button(current_position, board: Board):
     button = [b for b in board.game_objects if (b.type=="DiamondButtonGameObject")]
     list_button = []
@@ -35,6 +38,7 @@ def find_red_button(current_position, board: Board):
         list_button.append([distance, position.position])
     return list_button
 
+# Find red diamond and the distance from the bot
 def find_red_diamond(current_position, board: Board):
     red_diamond = [r for r in board.game_objects if (r.type == "DiamondGameObject" and r.properties.points == 2)]
     list_red_diamond = []
@@ -43,6 +47,7 @@ def find_red_diamond(current_position, board: Board):
         list_red_diamond.append([distance, position.position])
     return list_red_diamond
 
+# Find blue diamond and the distance from the bot
 def find_blue_diamond(current_position, board: Board):
     blue_diamond = [b for b in board.game_objects if (b.type == "DiamondGameObject" and b.properties.points == 1)]
     list_blue_diamond = []
@@ -51,6 +56,7 @@ def find_blue_diamond(current_position, board: Board):
         list_blue_diamond.append([distance, position.position])
     return list_blue_diamond
 
+# Find all diamond and the distance from the bot
 def find_diamond(current_position, board: Board):
     diamond = [d for d in board.game_objects if d.type == "DiamondGameObject"]
     list_diamond = []
@@ -59,16 +65,14 @@ def find_diamond(current_position, board: Board):
         list_diamond.append([distance, position.position])
     return list_diamond
 
-def calc_distance(obj1, obj2):
-    return abs(obj1.x - obj2.x) + abs(obj1.y - obj2.y)
-
+# Find the cluster with most diamonds
 def find_densest(diamonds, eps=1, min_samples=3):
     clusters = []
     visited = set()
     noise = set()
 
     def neighbors(diamond):
-        return [other for other in diamonds if calc_distance(diamond.position, other.position) <= eps]
+        return [other for other in diamonds if count_distance(diamond.position.x, diamond.position.y, other.position.x, other.position.y) <= eps]
 
     for diamond in diamonds:
         if diamond.id in visited:
@@ -94,10 +98,10 @@ def find_densest(diamonds, eps=1, min_samples=3):
                         cluster.append(neighbor)
     return clusters
 
+# Find all teleported
 def getAllTeleporterSorted(board,current_position):
     teleport = [x for x in board.game_objects if (x.type == "TeleportGameObject")]
     
-    # Group teleporters by their pair_id
     teleport_groups = {}
     for teleporter in teleport:
         pair_id = teleporter.properties.pair_id
@@ -105,17 +109,15 @@ def getAllTeleporterSorted(board,current_position):
             teleport_groups[pair_id] = []
         teleport_groups[pair_id].append(teleporter)
 
-    # Sort each group of teleporters by their distance to the bot and store the distance
     sorted_teleport_groups = {}
     for pair_id, teleporters in teleport_groups.items():
         sorted_teleporters = sorted([(teleporter.position, abs(current_position.x - teleporter.position.x) + abs(current_position.y - teleporter.position.y)) for teleporter in teleporters], key=lambda t: t[1])
         sorted_teleport_groups[pair_id] = sorted_teleporters
 
-    # Sort the sorted_teleport_groups dictionary based on the distance of the nearest teleporter in each group
     sorted_teleport_groups = dict(sorted(sorted_teleport_groups.items(), key=lambda item: item[1][0][1]))
-
     return sorted_teleport_groups
 
+# Find the distance between bot and base
 def findDistanceByBotAndBase(object,base,current_position):
     x = []
     y = []
@@ -129,5 +131,4 @@ def findDistanceByBotAndBase(object,base,current_position):
         posY = abs(current_position.y - position.position.y)
         distance1 = (abs(current_position.x  - position.position.x) + abs(current_position.y - position.position.y))
         y.append([distance1,position.position,[posX,posY],position.properties.points])
-
     return x,y

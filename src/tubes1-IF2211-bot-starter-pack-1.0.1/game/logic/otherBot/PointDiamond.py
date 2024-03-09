@@ -45,7 +45,7 @@ class PointDiamond(BaseLogic):
         all_diamond_sorted_list = sorted(z,key=lambda d: d[0])
         base_distance = abs(current_position.x - board_bot.properties.base.x) + abs(current_position.y - board_bot.properties.base.y)
 
-        # Analyze new state
+        # Goals condition
         if props.diamonds >= 4:
             # Move to base
             if(all_diamond_sorted_list[0][0] <= 1 and (props.diamonds + all_diamond_sorted_list[0][3] <= 5)):
@@ -118,6 +118,8 @@ class PointDiamond(BaseLogic):
                 self.current_direction = (self.current_direction + 1) % len(
                     self.directions
                 )
+        
+        # When bot stuck
         if(delta_x == 0 and delta_y == 0) :
             delta_x, delta_y = random.choice([(1, 0), (0, 1), (-1, 0), (0, -1)])
         return delta_x, delta_y

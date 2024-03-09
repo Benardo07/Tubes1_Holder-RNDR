@@ -23,12 +23,11 @@ class HighestDensity(BaseLogic):
         sorted_teleport_groups = getAllTeleporterSorted(board,current_position)
 
         # Sort blue and red diamonds by their distance to the bot, and store the distance
-        blue_sorted = sorted([(diamond, calc_distance(current_position, diamond.position)) for diamond in blue_diamonds], key=lambda t: t[1])
-        red_sorted = sorted([(diamond, calc_distance(current_position, diamond.position)) for diamond in red_diamonds], key=lambda t: t[1])
+        blue_sorted = sorted([(diamond, count_distance(current_position.x, current_position.y,  diamond.position.x, diamond.position.y)) for diamond in blue_diamonds], key=lambda t: t[1])
+        red_sorted = sorted([(diamond, count_distance(current_position.x, current_position.y,  diamond.position.x, diamond.position.y)) for diamond in red_diamonds], key=lambda t: t[1])
 
         # Find clusters of diamonds
         diamond_clusters = find_densest(all_diamonds)
-        print(diamond_clusters)
 
         # Find the densest cluster
         densest_cluster = max(diamond_clusters, key=len, default=[])
@@ -41,7 +40,6 @@ class HighestDensity(BaseLogic):
         else:
             densest_centroid = None
 
-        print(densest_centroid)
         # Set goal position based on conditions
         if densest_centroid:
             self.goal_position = densest_centroid
@@ -56,13 +54,13 @@ class HighestDensity(BaseLogic):
 
         # Find the shortest way using teleporters
         if self.goal_position:
-            direct_distance = calc_distance(current_position, self.goal_position)
+            direct_distance = count_distance(current_position.x, current_position.y, self.goal_position.x, self.goal_position.y)
             shortest_way = direct_distance
             shortest_way_position = self.goal_position
             for pair_id, teleporters in sorted_teleport_groups.items():
                 closest_teleporter, distance_to_closest_teleporter = teleporters[0]
                 second_teleporter = teleporters[1][0]
-                distance_tele2_goal = calc_distance(second_teleporter, self.goal_position)
+                distance_tele2_goal = count_distance(second_teleporter.x, second_teleporter.y, self.goal_position.x, self.goal_position.y)
 
                 if distance_tele2_goal < direct_distance:
                     way1 = distance_to_closest_teleporter + distance_tele2_goal

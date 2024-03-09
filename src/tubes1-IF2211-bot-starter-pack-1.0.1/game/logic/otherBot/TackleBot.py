@@ -50,6 +50,8 @@ class TackleBot(BaseLogic):
         if random.random() > 0.6:
             self.current_direction = (self.current_direction + 1) % len(self.directions)
 
-        return delta_x, delta_y
+        # When bot stuck
+        if(delta_x == 0 and delta_y == 0):
+            delta_x, delta_y = random.choice([(1, 0), (0, 1), (-1, 0), (0, -1)])
 
-    
+        return delta_x, delta_y   
