@@ -90,7 +90,7 @@ class NearestBase(BaseLogic):
             shortest_way_position = self.goal_position
 
             # Iterate over each pair of teleporters
-            for teleporters in sorted_teleport_groups.items():
+            for pair_id, teleporters in sorted_teleport_groups.items():
                 closest_teleporter, distance_to_closest_teleporter = teleporters[0]
                 print(closest_teleporter)
                 second_teleporter = teleporters[1][0]
