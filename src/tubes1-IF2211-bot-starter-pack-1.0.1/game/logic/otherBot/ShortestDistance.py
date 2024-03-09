@@ -3,7 +3,7 @@ from typing import Optional
 
 from game.logic.base import BaseLogic
 from game.models import GameObject, Board, Position
-from util import *
+from ...util import *
 
 class ShortestDistance(BaseLogic):
     def __init__(self):

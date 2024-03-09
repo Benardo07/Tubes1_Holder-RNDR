@@ -1,7 +1,7 @@
 from game.logic.base import BaseLogic
 from game.models import GameObject, Board, Position 
 from typing import Optional
-from util import *
+from ...util import *
 import random
 
 class PointDiamond(BaseLogic):
