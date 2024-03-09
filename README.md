@@ -142,5 +142,5 @@ Repositori ini berisi implementasi algoritma **_greedy by Nearest Base_**  dalam
 
 ## Dokumentasi Program
 
-![ss1](img/ss1.png)
-![ss2](img/ss2.png)
+![ss1](img/dokumentasi2.png)
+![ss2](img/dokumentasi1.png)
