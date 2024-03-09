@@ -1,12 +1,22 @@
 <h1 align="center"> Tugas Besar 1 IF2211 Strategi Algoritma</h1>
 <h1 align="center">  Pemanfaatan Algoritma Greedy dalam Pembuatan Bot Permainan Diamonds </h1>
 
+## Identitas Pengembang Program
+
+### **Kelompok 55: Holder RNDR**
+
+|   NIM    |          Nama           |
+| :------: | :---------------------: |
+| 13522021 |         Filbert         |
+| 13522055 |         Benardo         |
+| 13522113 | William Glory Henderson |
+
 
 ## Deskripsi Program
 
 Diamonds merupakan suatu programming challenge yang mempertandingkan bot yang anda buat dengan bot dari para pemain lainnya. Setiap pemain akan memiliki sebuah bot dimana tujuan dari bot ini adalah mengumpulkan diamond sebanyak-banyaknya. Cara mengumpulkan diamond tersebut tidak akan sesederhana itu, tentunya akan terdapat berbagai rintangan yang akan membuat permainan ini menjadi lebih seru dan kompleks. Untuk memenangkan pertandingan, setiap pemain harus mengimplementasikan strategi tertentu pada masing-masing bot-nya. Terdapat fitur teleport untuk berpindah tempat dan red button untuk melakukan reset pada diamond serta fitur tackle untuk mengambil seluruh diamond yang dimiliki bot lawan dengan menabrak bot tersebut.
 
-Repositori ini berisi implementasi algoritma **_greedy by Nearest Base_**  dalam pembuatan bot permainan diamonds. **_Greedy by Nearest Base_** adalah strategi greedy yang mengutamakan pengambilan diamond yang berada di dekat base terlebih dahulu. Kemudian, bot ini juga mengimplementasikan strategi tambahan yaitu **_greedy by Highest Density_** juga dimana bot akan mencari diamond di area dengan kepadatan tertinggi jika tidak ada diamond di dekat base. Lalu, ada juga beberapa strategi yang diimplementasikan selain strategi utama yang kita pilih (**_greedy by Nearest Base_**) yaitu seperti **_greedy by Highest Density_**, **_greedy by Point Diamond_**, **_greedy by Shortest Distance_**, dan **_greedy by Tackle**.
+Repositori ini berisi implementasi algoritma **_Greedy by Nearest Base_**  dalam pembuatan bot permainan diamonds. **_Greedy by Nearest Base_** adalah strategi greedy yang mengutamakan pengambilan diamond yang berada di dekat base terlebih dahulu. Kemudian, bot ini juga mengimplementasikan strategi tambahan yaitu **_Greedy by Highest Density_** juga dimana bot akan mencari diamond di area dengan kepadatan tertinggi jika tidak ada diamond di dekat base. Lalu, ada juga beberapa strategi yang diimplementasikan selain strategi utama yang kita pilih (**_Greedy by Nearest Base_**) yaitu seperti **_Greedy by Highest Density_**, **_Greedy by Point Diamond_**, **_Greedy by Shortest Distance_**, dan **_Greedy by Tackle**.
 
 ## Requirements Program
 
@@ -129,18 +139,8 @@ Repositori ini berisi implementasi algoritma **_greedy by Nearest Base_**  dalam
    ./run-bots.sh
    ```
 
-## Identitas Pengembang Program
-
-### **Kelompok 55: Holder RNDR**
-
-|   NIM    |          Nama           |
-| :------: | :---------------------: |
-| 13522021 |         Filbert         |
-| 13522055 |         Benardo         |
-| 13522113 | William Glory Henderson |
-
 
 ## Dokumentasi Program
 
-![ss1](img/dokumentasi2.png)
-![ss2](img/dokumentasi1.png)
+![dokumentasi2](img/dokumentasi2.png)
+![dokumentasi1](img/dokumentasi1.png)
