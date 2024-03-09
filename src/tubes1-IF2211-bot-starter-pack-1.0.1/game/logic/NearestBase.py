@@ -92,7 +92,6 @@ class NearestBase(BaseLogic):
             # Iterate over each pair of teleporters
             for pair_id, teleporters in sorted_teleport_groups.items():
                 closest_teleporter, distance_to_closest_teleporter = teleporters[0]
-                print(closest_teleporter)
                 second_teleporter = teleporters[1][0]
 
                 # Calculate the distance from the second teleporter in the pair to the goal position
